@@ -4,6 +4,7 @@ const {
   articlesData,
   commentsData
 } = require("../data");
+const { formatTimeStamps } = require("../../utils/index");
 
 exports.seed = (knex, Promise) => {
   return knex.migrate
@@ -19,14 +20,14 @@ exports.seed = (knex, Promise) => {
         .insert(usersData)
         .returning("*");
     })
-    .then(topicsData => {
-      const houseRef = createRef(houseRows, "house_name", "house_id");
-      const formattedWizards = formatWizards(wizardData, houseRef);
-      return knex("wizards")
-        .insert(formattedWizards)
+    .then(() => {
+      const formattedArticlesData = formatTimeStamps(articlesData);
+      console.log(formattedArticlesData);
+      return knex("articles")
+        .insert(formattedArticlesData)
         .returning("*");
     })
-    .then(usersData => {
-      console.log(usersData); // to see the tables
+    .then(articlesData => {
+      console.log(articlesData); // to see the tables
     });
 };
