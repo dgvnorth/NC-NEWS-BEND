@@ -4,7 +4,12 @@ const {
   articlesData,
   commentsData
 } = require("../data");
-const { formatTimeStamps } = require("../../utils/index");
+const {
+  formatTimeStamps,
+  createRef,
+  formatBelongToComments,
+  renameCommentsKeys
+} = require("../../utils/index");
 
 exports.seed = (knex, Promise) => {
   return knex.migrate
@@ -22,12 +27,26 @@ exports.seed = (knex, Promise) => {
     })
     .then(() => {
       const formattedArticlesData = formatTimeStamps(articlesData);
-      console.log(formattedArticlesData);
       return knex("articles")
         .insert(formattedArticlesData)
         .returning("*");
     })
     .then(articlesData => {
-      console.log(articlesData); // to see the tables
+      const articlesRef = createRef(articlesData, "title", "article_id");
+      const formattedBelongToKeyComments = formatBelongToComments(
+        commentsData,
+        articlesRef
+      );
+      const renamedCreatedByKeyComments = renameCommentsKeys(
+        formattedBelongToKeyComments,
+        "created_by",
+        "author"
+      );
+      const formattedCreated_atComments = formatTimeStamps(
+        renamedCreatedByKeyComments
+      );
+      return knex("comments")
+        .insert(formattedCreated_atComments)
+        .returning("*");
     });
 };
