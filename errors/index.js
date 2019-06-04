@@ -1,11 +1,19 @@
 exports.routeNotFound = (req, res) => {
-  res.status(404).send({ msg: 'Route Not Found' });
+  console.log("inside 404");
+  res.status(404).send({ msg: "Route Not Found" });
 };
 
 exports.methodNotAllowed = (req, res) => {
-  res.status(405).send({ msg: 'Method Not Allowed' });
+  console.log("inside 405");
+  res.status(405).send({ msg: "Method Not Allowed" });
+};
+
+exports.badRequest = (err, req, res, next) => {
+  console.log("inside 400", err);
+  res.status(400).send({ msg: "Bad Request" });
 };
 
 exports.handle500 = (err, req, res, next) => {
-  res.status(500).send({ msg: 'Internal Server Error' });
+  console.log("inside 500");
+  res.status(500).send({ msg: "Internal Server Error" });
 };
