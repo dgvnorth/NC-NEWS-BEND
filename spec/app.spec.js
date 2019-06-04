@@ -51,14 +51,9 @@ describe("/", () => {
               });
             });
         });
-        it("GET status:400, for an non existing username", () => {
+        it("GET status:404, for an non existing username", () => {
           return request(app)
-            .get("/api/users/notAndId")
-            .expect(400);
-        });
-        it("GET status:404, when route not found", () => {
-          return request(app)
-            .get("/api/userss/butter_bridge")
+            .get("/api/users/999999")
             .expect(404);
         });
       });
@@ -83,13 +78,13 @@ describe("/", () => {
               );
               expect(body.article).to.eql({
                 author: "butter_bridge",
-                title: "They're not exactly dogs, are they?",
-                article_id: 9,
-                body: "Well? Think about it.",
+                title: "Living in the shadow of a great man",
+                article_id: 1,
+                body: "I find this existence challenging",
                 topic: "mitch",
-                created_at: "1986-11-23T12:21:54.171Z",
-                votes: 0,
-                comment_count: "2"
+                created_at: "2018-11-15T12:21:54.171Z",
+                votes: 100,
+                comment_count: "13"
               });
             });
         });
@@ -98,14 +93,9 @@ describe("/", () => {
             .get("/api/articles/notAndId")
             .expect(400);
         });
-        it("GET status:404, when route not found", () => {
-          return request(app)
-            .get("/api/articless/1")
-            .expect(404);
-        });
         it("GET status:404, for a non-existing article_id", () => {
           return request(app)
-            .get("/api/articless/199")
+            .get("/api/articles/1999999")
             .expect(404);
         });
       });

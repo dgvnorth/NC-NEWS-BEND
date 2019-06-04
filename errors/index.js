@@ -8,9 +8,13 @@ exports.methodNotAllowed = (req, res) => {
   res.status(405).send({ msg: "Method Not Allowed" });
 };
 
-exports.badRequest = (err, req, res, next) => {
+exports.handlePsqlErrors = (err, req, res, next) => {
   console.log("inside 400", err);
-  res.status(400).send({ msg: "Bad Request" });
+  const psqlErrorCodes = ["23502", "42703", "22P02"];
+  if (psqlErrorCodes.includes(err.code))
+    res.status(400).send({ message: err.message });
+  else if (err.status === 404) res.status(404).send(err);
+  else next(err);
 };
 
 exports.handle500 = (err, req, res, next) => {
