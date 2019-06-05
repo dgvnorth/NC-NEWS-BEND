@@ -4,6 +4,7 @@ exports.fetchArticleByArticleId = article_id => {
   return connection("articles")
     .where("articles.article_id", article_id)
     .select(
+      //'articles.*'
       "articles.article_id",
       "articles.author",
       "articles.body",
@@ -14,7 +15,15 @@ exports.fetchArticleByArticleId = article_id => {
     )
     .count("comment_id as comment_count")
     .from("articles")
-    .innerJoin("comments", "comments.article_id", "=", "articles.article_id")
+    .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
     .groupBy("articles.article_id")
+    .returning("*");
+};
+
+exports.updateArticleVotes = (article_id, increment) => {
+  console.log("inside patching model");
+  return connection("articles")
+    .where({ article_id })
+    .increment("votes", increment)
     .returning("*");
 };

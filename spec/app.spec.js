@@ -6,11 +6,11 @@ const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
 
-describe("/", () => {
+describe.only("/", () => {
   beforeEach(() => connection.seed.run());
   after(() => connection.destroy());
 
-  describe.only("/api", () => {
+  describe("/api", () => {
     it("GET status:200", () => {
       return request(app)
         .get("/api")
@@ -76,16 +76,7 @@ describe("/", () => {
                 "votes",
                 "comment_count"
               );
-              expect(body.article).to.eql({
-                author: "butter_bridge",
-                title: "Living in the shadow of a great man",
-                article_id: 1,
-                body: "I find this existence challenging",
-                topic: "mitch",
-                created_at: "2018-11-15T12:21:54.171Z",
-                votes: 100,
-                comment_count: "13"
-              });
+              expect(+body.article.comment_count).to.equal(13);
             });
         });
         it("GET status:400, for an invalid article_id", () => {
@@ -96,6 +87,38 @@ describe("/", () => {
         it("GET status:404, for a non-existing article_id", () => {
           return request(app)
             .get("/api/articles/1999999")
+            .expect(404);
+        });
+        it("PATCH /:article_id - status:200, increments votes and returns the updated article", () => {
+          const newVote = 10;
+          return request(app)
+            .patch("/api/articles/1")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.article).to.eql({
+                author: "butter_bridge",
+                title: "Living in the shadow of a great man",
+                article_id: 1,
+                body: "I find this existence challenging",
+                topic: "mitch",
+                created_at: "2018-11-15T12:21:54.171Z",
+                votes: 110
+              });
+            });
+        });
+        it("PATCH/:article_id - status 400 - for an invalid article_id", () => {
+          const newVote = 10;
+          return request(app)
+            .patch("/api/articles/notAndId")
+            .send({ inc_votes: newVote })
+            .expect(400);
+        });
+        it("PATCH/:article_id - status 404 - for a non-existing article_id", () => {
+          const newVote = 10;
+          return request(app)
+            .patch("/api/articles/1999999")
+            .send({ inc_votes: newVote })
             .expect(404);
         });
       });
