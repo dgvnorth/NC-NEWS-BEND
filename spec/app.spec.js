@@ -122,6 +122,38 @@ describe.only("/", () => {
             .expect(404);
         });
       });
+      describe.only("/:article_id/comments", () => {
+        it("POST/:article_id/comments  - status 201 - accepts an object with the username and body properties and responds with the posted comment", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({
+              username: "butter_bridge",
+              body:
+                "I recommend this movie, it makes you reflect about the meaning of life"
+            })
+            .expect(201)
+            .then(({ body }) => {
+              expect(body.comment.body).to.eql(
+                "I recommend this movie, it makes you reflect about the meaning of life"
+              );
+            });
+        });
+        it("POST/:article_id/comments  - status 400 - when passed an empty comment object", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({
+              username: 1,
+              body: ""
+            })
+            .expect(400);
+        });
+        it("POST/:article_id/comments  - status 404 - when passed an empty comment object", () => {
+          return request(app)
+            .post("/api/articles/1/comments")
+            .send({})
+            .expect(404);
+        });
+      });
     });
   });
 });

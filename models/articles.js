@@ -21,7 +21,6 @@ exports.fetchArticleByArticleId = article_id => {
 };
 
 exports.updateArticleVotes = (article_id, increment) => {
-  console.log("inside patching model");
   return connection("articles")
     .where({ article_id })
     .increment("votes", increment)
