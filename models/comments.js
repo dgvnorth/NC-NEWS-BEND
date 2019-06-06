@@ -28,3 +28,9 @@ exports.updateCommentVotes = (comment_id, increment) => {
     .increment("votes", increment)
     .returning("*");
 };
+
+exports.removeComment = comment_id => {
+  return connection("comments")
+    .where({ comment_id })
+    .del();
+};

@@ -1,7 +1,8 @@
 const {
   createComment,
   fetchComments,
-  updateCommentVotes
+  updateCommentVotes,
+  removeComment
 } = require("../models/comments");
 
 exports.addCommentByArticleId = (req, res, next) => {
@@ -21,7 +22,7 @@ exports.sendCommentsByArticleId = (req, res, next) => {
   fetchComments(article_id)
     .then(comments => {
       if (comments.length === 0)
-        return Promise.reject({ status: 404, message: "article not found" });
+        return Promise.reject({ status: 404, message: "comment not found" });
       res.status(200).send({ comments });
     })
     .catch(next);
@@ -30,12 +31,22 @@ exports.sendCommentsByArticleId = (req, res, next) => {
 exports.patchCommentById = (req, res, next) => {
   const increment = req.body.inc_votes;
   const { comment_id } = req.params;
-  console.log(comment_id);
   updateCommentVotes(comment_id, increment)
     .then(([comment]) => {
       if (!comment)
-        return Promise.reject({ status: 404, message: "comment_id not found" });
+        return Promise.reject({ status: 404, message: "comment not found" });
       res.status(200).send({ comment });
+    })
+    .catch(next);
+};
+
+exports.deleteCommentById = (req, res, next) => {
+  const { comment_id } = req.params;
+  removeComment(comment_id)
+    .then(delCount => {
+      if (delCount) res.sendStatus(204);
+      else if (!delCount)
+        return Promise.reject({ status: 404, msg: "comment not found" });
     })
     .catch(next);
 };

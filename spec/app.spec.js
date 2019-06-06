@@ -1,6 +1,4 @@
 process.env.NODE_ENV = "test";
-
-// const { expect } = require("chai");
 const request = require("supertest");
 
 const chai = require("chai");
@@ -10,8 +8,11 @@ const { expect } = chai;
 const app = require("../app");
 const connection = require("../db/connection");
 
-describe("/", () => {
-  beforeEach(() => connection.seed.run());
+describe.only("/", () => {
+  beforeEach(function() {
+    this.timeout(4000);
+    return connection.seed.run();
+  });
   after(() => connection.destroy());
 
   describe("/api", () => {
@@ -58,7 +59,10 @@ describe("/", () => {
         it("GET status:404, for an non existing username", () => {
           return request(app)
             .get("/api/users/999999")
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("username not found");
+            });
         });
       });
     });
@@ -166,12 +170,20 @@ describe("/", () => {
         it("GET status:400, for an invalid article_id", () => {
           return request(app)
             .get("/api/articles/notAndId")
-            .expect(400);
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' invalid input syntax for integer: "notAndId"'
+              );
+            });
         });
         it("GET status:404, for a non-existing article_id", () => {
           return request(app)
             .get("/api/articles/1999999")
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("article not found");
+            });
         });
         it("PATCH /:article_id - status:200, increments votes and returns the updated article", () => {
           const newVote = 10;
@@ -196,14 +208,22 @@ describe("/", () => {
           return request(app)
             .patch("/api/articles/notAndId")
             .send({ inc_votes: newVote })
-            .expect(400);
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' invalid input syntax for integer: "notAndId"'
+              );
+            });
         });
         it("PATCH/:article_id - status 404 - for a non-existing article_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/articles/1999999")
             .send({ inc_votes: newVote })
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("article not found");
+            });
         });
       });
       describe("/:article_id/comments", () => {
@@ -229,13 +249,21 @@ describe("/", () => {
               username: 1,
               body: ""
             })
-            .expect(400);
+            .expect(400)
+            .then(res => {
+              const actual =
+                ' insert or update on table "comments" violates foreign key constraint "comments_author_foreign"';
+              expect(res.body.message).to.equal(actual);
+            });
         });
         it("POST/:article_id/comments  - status 404 - when passed an empty comment object", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({})
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("comment not found");
+            });
         });
         it("GET/:article_id/comments - status 200 - an array of comments for the given article_id of which each comment should have the comment_id, votes, created_at, author and body properties", () => {
           return request(app)
@@ -286,20 +314,23 @@ describe("/", () => {
         it("GET status:400, for an invalid article_id", () => {
           return request(app)
             .get("/api/articles/notAndId/comments")
-            .expect(400);
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' invalid input syntax for integer: "notAndId"'
+              );
+            });
         });
         it("GET status:404, for an existing article_id  with no comments", () => {
           return request(app)
             .get("/api/articles/3/comments")
-            .expect(404);
-        });
-        it("GET status:404, for a non-existing article_id  with no comments", () => {
-          return request(app)
-            .get("/api/articles/19999999/comments")
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("comment not found");
+            });
         });
       });
-      describe.only("PATCH /api/comments/:comment_id", () => {
+      describe("PATCH /api/comments/:comment_id", () => {
         it("PATCH /:comment_id - status:200, increments votes and returns the updated comment", () => {
           const newVote = 1;
           return request(app)
@@ -323,14 +354,45 @@ describe("/", () => {
           return request(app)
             .patch("/api/comments/notAndId")
             .send({ inc_votes: newVote })
-            .expect(400);
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' invalid input syntax for integer: "notAndId"'
+              );
+            });
         });
         it("PATCH/:comment_id - status 404 - for a non-existing comment_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/comments/1999999")
             .send({ inc_votes: newVote })
-            .expect(404);
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("comment not found");
+            });
+        });
+        it("DELETE/:comment_id - status:204 - deletes the selected comment", () => {
+          return request(app)
+            .delete("/api/comments/3")
+            .expect(204);
+        });
+        it("DELETE/:comment_id - status 400 - for an invalid comment_id", () => {
+          return request(app)
+            .patch("/api/comments/notAndId")
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' invalid input syntax for integer: "notAndId"'
+              );
+            });
+        });
+        it("DELETE/:comment_id - status 400 - for an non-existing comment_id", () => {
+          return request(app)
+            .patch("/api/comments/199999")
+            .expect(404)
+            .then(res => {
+              expect(res.body.message).to.equal("comment not found");
+            });
         });
       });
     });

@@ -9,7 +9,7 @@ exports.sendArticleByArticleId = (req, res, next) => {
   fetchArticleByArticleId(article_id)
     .then(([article]) => {
       if (!article) {
-        return Promise.reject({ status: 404, message: "username not found" });
+        return Promise.reject({ status: 404, message: "article not found" });
       }
       res.status(200).send({ article });
     })
@@ -22,7 +22,7 @@ exports.patchArticleById = (req, res, next) => {
   updateArticleVotes(article_id, increment)
     .then(([article]) => {
       if (!article)
-        return Promise.reject({ status: 404, message: "article_id not found" });
+        return Promise.reject({ status: 404, message: "article not found" });
       res.status(200).send({ article });
     })
     .catch(next);
