@@ -87,7 +87,7 @@ describe("/", () => {
             });
           });
       });
-      it.only("GET status:200, returns filtered articles by the username value specified in the query", () => {
+      it("GET status:200, returns filtered articles by the username value specified in the query", () => {
         return request(app)
           .get("/api/articles?author=butter_bridge")
           .expect(200)
@@ -124,7 +124,7 @@ describe("/", () => {
             ]);
           });
       });
-      it.only("GET status:200, returns filtered articles by the topic value specified in the query", () => {
+      it("GET status:200, returns filtered articles by the topic value specified in the query", () => {
         return request(app)
           .get("/api/articles?topic=cats")
           .expect(200)
@@ -296,6 +296,40 @@ describe("/", () => {
         it("GET status:404, for a non-existing article_id  with no comments", () => {
           return request(app)
             .get("/api/articles/19999999/comments")
+            .expect(404);
+        });
+      });
+      describe.only("PATCH /api/comments/:comment_id", () => {
+        it("PATCH /:comment_id - status:200, increments votes and returns the updated comment", () => {
+          const newVote = 1;
+          return request(app)
+            .patch("/api/comments/3")
+            .send({ inc_votes: newVote })
+            .expect(200)
+            .then(({ body }) => {
+              expect(body.comment).to.eql({
+                comment_id: 3,
+                author: "icellusedkars",
+                article_id: 1,
+                votes: 101,
+                created_at: "2015-11-23T12:36:03.389Z",
+                body:
+                  "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works."
+              });
+            });
+        });
+        it("PATCH/:comment_id - status 400 - for an invalid comment_id", () => {
+          const newVote = 10;
+          return request(app)
+            .patch("/api/comments/notAndId")
+            .send({ inc_votes: newVote })
+            .expect(400);
+        });
+        it("PATCH/:comment_id - status 404 - for a non-existing comment_id", () => {
+          const newVote = 10;
+          return request(app)
+            .patch("/api/comments/1999999")
+            .send({ inc_votes: newVote })
             .expect(404);
         });
       });

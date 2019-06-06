@@ -21,3 +21,10 @@ exports.fetchComments = (
     .from("comments")
     .orderBy(sort_by, order);
 };
+
+exports.updateCommentVotes = (comment_id, increment) => {
+  return connection("comments")
+    .where({ comment_id })
+    .increment("votes", increment)
+    .returning("*");
+};
