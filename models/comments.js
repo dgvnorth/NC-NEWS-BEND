@@ -9,3 +9,15 @@ exports.createComment = (article_id, addedComment) => {
     })
     .returning("*");
 };
+
+exports.fetchComments = (
+  article_id,
+  sort_by = "article_id",
+  order = "desc"
+) => {
+  return connection("comments")
+    .where("article_id", article_id)
+    .select("comments.*")
+    .from("comments")
+    .orderBy(sort_by, order);
+};

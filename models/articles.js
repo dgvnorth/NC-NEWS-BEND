@@ -26,3 +26,21 @@ exports.updateArticleVotes = (article_id, increment) => {
     .increment("votes", increment)
     .returning("*");
 };
+
+exports.fetchAllArticles = (
+  { author, topic },
+  sort_by = "created_at",
+  order = "desc"
+) => {
+  return connection("articles")
+    .select("articles.*")
+    .from("articles")
+    .orderBy(sort_by, order)
+    .modify(query => {
+      if (author) query.where("author", author);
+      else if (topic) query.where("topic", topic);
+    })
+    .then(articles => {
+      return articles;
+    });
+};

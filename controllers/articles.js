@@ -1,6 +1,7 @@
 const {
   fetchArticleByArticleId,
-  updateArticleVotes
+  updateArticleVotes,
+  fetchAllArticles
 } = require("../models/articles");
 
 exports.sendArticleByArticleId = (req, res, next) => {
@@ -16,7 +17,6 @@ exports.sendArticleByArticleId = (req, res, next) => {
 };
 
 exports.patchArticleById = (req, res, next) => {
-  console.log("inside patching article");
   const increment = req.body.inc_votes;
   const { article_id } = req.params;
   updateArticleVotes(article_id, increment)
@@ -26,4 +26,10 @@ exports.patchArticleById = (req, res, next) => {
       res.status(200).send({ article });
     })
     .catch(next);
+};
+
+exports.sendAllArticles = (req, res, next) => {
+  fetchAllArticles(req.query).then(articles => {
+    res.status(200).send({ articles });
+  });
 };
