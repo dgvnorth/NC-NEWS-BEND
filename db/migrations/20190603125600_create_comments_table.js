@@ -5,6 +5,7 @@ exports.up = function(knex, Promise) {
     commentsTable
       .string("author")
       .references("users.username")
+      .notNullable()
       .onDelete("CASCADE");
     commentsTable
       .integer("article_id")

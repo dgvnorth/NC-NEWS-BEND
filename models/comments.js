@@ -12,8 +12,7 @@ exports.createComment = (article_id, addedComment) => {
 
 exports.fetchComments = (
   article_id,
-  sort_by = "article_id",
-  order = "desc"
+  { sort_by = "article_id", order = "desc" }
 ) => {
   return connection("comments")
     .where("article_id", article_id)
@@ -22,7 +21,7 @@ exports.fetchComments = (
     .orderBy(sort_by, order);
 };
 
-exports.updateCommentVotes = (comment_id, increment) => {
+exports.updateCommentVotes = (comment_id, increment = 0) => {
   return connection("comments")
     .where({ comment_id })
     .increment("votes", increment)

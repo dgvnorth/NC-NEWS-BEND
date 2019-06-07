@@ -1,4 +1,5 @@
 node_modules
 knexfile.js
 query.sql
+api.js
 .DS_Store

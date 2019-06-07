@@ -29,7 +29,11 @@ exports.patchArticleById = (req, res, next) => {
 };
 
 exports.sendAllArticles = (req, res, next) => {
-  fetchAllArticles(req.query).then(articles => {
-    res.status(200).send({ articles });
-  });
+  fetchAllArticles(req.query)
+    .then(articles => {
+      if (articles.length === 0)
+        return Promise.reject({ status: 404, message: "not found" });
+      res.status(200).send({ articles });
+    })
+    .catch(next);
 };

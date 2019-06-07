@@ -20,18 +20,19 @@ exports.fetchArticleByArticleId = article_id => {
     .returning("*");
 };
 
-exports.updateArticleVotes = (article_id, increment) => {
+exports.updateArticleVotes = (article_id, increment = 0) => {
   return connection("articles")
     .where({ article_id })
     .increment("votes", increment)
     .returning("*");
 };
 
-exports.fetchAllArticles = (
-  { author, topic },
+exports.fetchAllArticles = ({
+  author,
+  topic,
   sort_by = "created_at",
   order = "desc"
-) => {
+}) => {
   return connection("articles")
     .select("articles.*")
     .from("articles")

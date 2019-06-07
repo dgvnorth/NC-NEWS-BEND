@@ -8,7 +8,7 @@ const { expect } = chai;
 const app = require("../app");
 const connection = require("../db/connection");
 
-describe.only("/", () => {
+describe("/", () => {
   beforeEach(function() {
     this.timeout(4000);
     return connection.seed.run();
@@ -30,9 +30,14 @@ describe.only("/", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body }) => {
-            expect(body.topics).to.be.an("object");
-            expect(body.topics).to.contain.keys("slug", "description");
+            expect(body.topics).to.be.an("array");
+            expect(body.topics[0]).to.contain.keys("slug", "description");
           });
+      });
+      it("PATCH status:405, for an invalid method", () => {
+        return request(app)
+          .patch("/api/topics")
+          .expect(405);
       });
     });
     describe("/users", () => {
@@ -64,6 +69,11 @@ describe.only("/", () => {
               expect(res.body.message).to.equal("username not found");
             });
         });
+        it("PUT/:username - status 405, for an invalid method", () => {
+          return request(app)
+            .put("/api/users/1000")
+            .expect(405);
+        });
       });
     });
     describe("/articles", () => {
@@ -87,7 +97,7 @@ describe.only("/", () => {
             const sorted_by = "article_id";
             expect(body.articles).to.be.an("array");
             expect(body.articles).to.be.sortedBy(sorted_by, {
-              ascending: true
+              descending: true
             });
           });
       });
@@ -147,6 +157,22 @@ describe.only("/", () => {
             ]);
           });
       });
+      it("GET/:topic - status 404 - when topic not found", () => {
+        return request(app)
+          .get("/api/articles?topic=noExistingTopic")
+          .expect(404)
+          .then(res => {
+            expect(res.body.message).to.equal("not found");
+          });
+      });
+      it("GET/:authot - status 404 - when author not found", () => {
+        return request(app)
+          .get("/api/articles?author=noExistingAuthor")
+          .expect(404)
+          .then(res => {
+            expect(res.body.message).to.equal("not found");
+          });
+      });
       describe("/articles/article_id", () => {
         it("GET status:200, returns an article object containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
           return request(app)
@@ -164,7 +190,7 @@ describe.only("/", () => {
                 "votes",
                 "comment_count"
               );
-              expect(+body.article.comment_count).to.equal(13);
+              expect(body.article.comment_count).to.equal("13");
             });
         });
         it("GET status:400, for an invalid article_id", () => {
@@ -186,7 +212,7 @@ describe.only("/", () => {
             });
         });
         it("PATCH /:article_id - status:200, increments votes and returns the updated article", () => {
-          const newVote = 10;
+          const newVote = 1;
           return request(app)
             .patch("/api/articles/1")
             .send({ inc_votes: newVote })
@@ -199,7 +225,7 @@ describe.only("/", () => {
                 body: "I find this existence challenging",
                 topic: "mitch",
                 created_at: "2018-11-15T12:21:54.171Z",
-                votes: 110
+                votes: 101
               });
             });
         });
@@ -225,6 +251,16 @@ describe.only("/", () => {
               expect(res.body.message).to.equal("article not found");
             });
         });
+        it("PATCH status:405, for an invalid method when no passing article_id", () => {
+          return request(app)
+            .patch("/api/articles")
+            .expect(405);
+        });
+        it("PUT/:article_id - status 405, for an invalid method", () => {
+          return request(app)
+            .put("/api/articles/1")
+            .expect(405);
+        });
       });
       describe("/:article_id/comments", () => {
         it("POST/:article_id/comments  - status 201 - accepts an object with the username and body properties and responds with the posted comment", () => {
@@ -242,7 +278,7 @@ describe.only("/", () => {
               );
             });
         });
-        it("POST/:article_id/comments  - status 400 - when passed an empty comment object", () => {
+        it("POST/:article_id/comments  - status 400 - when passed a comment object with missing required keys", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -256,13 +292,27 @@ describe.only("/", () => {
               expect(res.body.message).to.equal(actual);
             });
         });
-        it("POST/:article_id/comments  - status 404 - when passed an empty comment object", () => {
+        it("POST/:article_id/comments  - status 400 - when passed an empty comment object", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({})
+            .expect(400)
+            .then(res => {
+              expect(res.body.message).to.equal(
+                ' null value in column "author" violates not'
+              );
+            });
+        });
+        it("POST/:article_id/comments - status 404 - valid article_id does not exist", () => {
+          return request(app)
+            .post("/api/articles/19999/comments")
+            .send({
+              username: 1,
+              body: "testing"
+            })
             .expect(404)
             .then(res => {
-              expect(res.body.message).to.equal("comment not found");
+              expect(res.body.message).to.equal("article not found");
             });
         });
         it("GET/:article_id/comments - status 200 - an array of comments for the given article_id of which each comment should have the comment_id, votes, created_at, author and body properties", () => {
@@ -282,11 +332,13 @@ describe.only("/", () => {
         });
         it("GET/:article_id/comments - status 200 - returns an array of comments for the given article_id sorted by article_id", () => {
           return request(app)
-            .get("/api/articles/1/comments?sort_by=article_id")
+            .get("/api/articles/1/comments?sort_by=votes")
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).to.be.an("array");
-              expect(body.comments).to.be.sortedBy("article_id");
+              expect(body.comments).to.be.sortedBy("votes", {
+                descending: true
+              });
             });
         });
         it("GET/:article_id/comments - status 200 - returns an array of comments for the given article_id sorted by article_id in an ascending order", () => {
@@ -323,14 +375,19 @@ describe.only("/", () => {
         });
         it("GET status:404, for an existing article_id  with no comments", () => {
           return request(app)
-            .get("/api/articles/3/comments")
+            .get("/api/articles/99999/comments")
             .expect(404)
             .then(res => {
-              expect(res.body.message).to.equal("comment not found");
+              expect(res.body.message).to.equal("article not found");
             });
         });
+        it("PUT/:article_id/comments - status 405 - for an invalid method", () => {
+          return request(app)
+            .put("/api/articles/3/comments")
+            .expect(405);
+        });
       });
-      describe("PATCH /api/comments/:comment_id", () => {
+      describe("/comments/:comment_id", () => {
         it("PATCH /:comment_id - status:200, increments votes and returns the updated comment", () => {
           const newVote = 1;
           return request(app)
@@ -370,6 +427,11 @@ describe.only("/", () => {
             .then(res => {
               expect(res.body.message).to.equal("comment not found");
             });
+        });
+        it("PUT/:comments_id - status 405, for an invalid method", () => {
+          return request(app)
+            .put("/api/comments/1")
+            .expect(405);
         });
         it("DELETE/:comment_id - status:204 - deletes the selected comment", () => {
           return request(app)
