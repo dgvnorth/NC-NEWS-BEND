@@ -77,7 +77,7 @@ describe("/", () => {
       });
     });
     describe("/articles", () => {
-      it.only("GET status:200, returns all article objects containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
+      it("GET status:200, returns all article objects containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -120,55 +120,21 @@ describe("/", () => {
             });
           });
       });
-      it.only("GET status:200, returns filtered articles by the username value specified in the query", () => {
+      it("GET status:200, returns filtered articles by the username value specified in the query", () => {
         return request(app)
           .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body }) => {
             const articles = body.articles;
             const constainAuthor = ({ articles }) => {
-              console.log(articles);
               let count = 0;
               for (let i = 0; i < articles.length; i++) {
                 count++;
               }
-              console.log(count);
               return count;
             };
             expect(body.articles).to.be.an("array");
             expect(constainAuthor({ articles })).to.equal(3);
-            //   expect(body.articles).to.be.eql([
-            //     {
-            //       article_id: 1,
-            //       title: "Living in the shadow of a great man",
-            //       topic: "mitch",
-            //       author: "butter_bridge",
-            //       body: "I find this existence challenging",
-            //       comment_count: "2",
-            //       created_at: "2018-11-15T12:21:54.171Z",
-            //       votes: 100
-            //     },
-            //     {
-            //       article_id: 9,
-            //       title: "They're not exactly dogs, are they?",
-            //       topic: "mitch",
-            //       author: "butter_bridge",
-            //       body: "Well? Think about it.",
-            //       comment_count: "0",
-            //       created_at: "1986-11-23T12:21:54.171Z",
-            //       votes: 0
-            //     },
-            //     {
-            //       article_id: 12,
-            //       title: "Moustache",
-            //       topic: "mitch",
-            //       author: "butter_bridge",
-            //       body: "Have you seen the size of that thing?",
-            //       comment_count: "0",
-            //       created_at: "1974-11-26T12:21:54.171Z",
-            //       votes: 0
-            //     }
-            //   ]);
           });
       });
       it("GET status:200, returns filtered articles by the topic value specified in the query", () => {
@@ -199,7 +165,7 @@ describe("/", () => {
             expect(res.body.message).to.equal("not found");
           });
       });
-      it.only("GET/:author - status:404 - when author not found", () => {
+      it("GET/:author - status:404 - when author not found", () => {
         return request(app)
           .get("/api/articles?author=noExistingAuthor")
           .expect(404)
@@ -381,19 +347,19 @@ describe("/", () => {
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).to.be.an("array");
-              expect(body.comments).to.be.sortedBy("article_id", {
+              expect(body.comments).to.be.sortedBy("created_at", {
                 ascending: true
               });
             });
         });
         it("GET/:article_id/comments - status:200 - returns an array of comments for the given article_id sorted by article_id in an descending order", () => {
           return request(app)
-            .get("/api/articles/1/comments?order=asc")
+            .get("/api/articles/1/comments?order=desc")
             .expect(200)
             .then(({ body }) => {
               expect(body.comments).to.be.an("array");
-              expect(body.comments).to.be.sortedBy("article_id", {
-                ascending: true
+              expect(body.comments).to.be.sortedBy("created_at", {
+                descending: true
               });
             });
         });

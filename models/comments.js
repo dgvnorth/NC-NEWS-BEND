@@ -12,11 +12,17 @@ exports.createComment = (article_id, addedComment) => {
 
 exports.fetchComments = (
   article_id,
-  { sort_by = "article_id", order = "desc" }
+  { sort_by = "created_at", order = "desc" }
 ) => {
   return connection("comments")
     .where("article_id", article_id)
-    .select("comments.*")
+    .select(
+      "comments.comment_id",
+      "comments.votes",
+      "comments.created_at",
+      "comments.author",
+      "comments.body"
+    )
     .from("comments")
     .orderBy(sort_by, order);
 };
