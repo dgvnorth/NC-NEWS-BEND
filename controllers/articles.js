@@ -11,6 +11,7 @@ exports.sendArticleByArticleId = (req, res, next) => {
       if (!article) {
         return Promise.reject({ status: 404, message: "article not found" });
       }
+      console.log({ article });
       res.status(200).send({ article });
     })
     .catch(next);
@@ -29,8 +30,10 @@ exports.patchArticleById = (req, res, next) => {
 };
 
 exports.sendAllArticles = (req, res, next) => {
+  console.log(req.query);
   fetchAllArticles(req.query)
     .then(articles => {
+      // console.log({ articles });
       if (articles.length === 0)
         return Promise.reject({ status: 404, message: "not found" });
       res.status(200).send({ articles });

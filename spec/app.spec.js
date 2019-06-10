@@ -69,7 +69,7 @@ describe("/", () => {
               expect(res.body.message).to.equal("username not found");
             });
         });
-        it("PUT/:username - status 405, for an invalid method", () => {
+        it("PUT/:username - status:405, for an invalid method", () => {
           return request(app)
             .put("/api/users/1000")
             .expect(405);
@@ -77,12 +77,31 @@ describe("/", () => {
       });
     });
     describe("/articles", () => {
-      it("GET status:200, returns an article object sorted_by any valid column containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
+      it.only("GET status:200, returns all article objects containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
         return request(app)
-          .get("/api/articles?sort_by=created_at")
+          .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            const sorted_by = "created_at";
+            expect(body.articles[0]).to.be.an("object");
+            expect(body.articles[0]).to.contain.keys(
+              "author",
+              "title",
+              "article_id",
+              "body",
+              "topic",
+              "created_at",
+              "votes",
+              "comment_count"
+            );
+            expect(body.articles[0].comment_count).to.equal("13");
+          });
+      });
+      it("GET status:200, returns an article object sorted_by any valid column containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
+        return request(app)
+          .get("/api/articles?sort_by=author")
+          .expect(200)
+          .then(({ body }) => {
+            const sorted_by = "author";
             expect(body.articles).to.be.an("array");
             expect(body.articles).to.be.sortedBy(sorted_by, {
               descending: true
@@ -101,41 +120,55 @@ describe("/", () => {
             });
           });
       });
-      it("GET status:200, returns filtered articles by the username value specified in the query", () => {
+      it.only("GET status:200, returns filtered articles by the username value specified in the query", () => {
         return request(app)
           .get("/api/articles?author=butter_bridge")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles).to.be.an("array");
-            expect(body.articles).to.be.eql([
-              {
-                article_id: 1,
-                title: "Living in the shadow of a great man",
-                topic: "mitch",
-                author: "butter_bridge",
-                body: "I find this existence challenging",
-                created_at: "2018-11-15T12:21:54.171Z",
-                votes: 100
-              },
-              {
-                article_id: 9,
-                title: "They're not exactly dogs, are they?",
-                topic: "mitch",
-                author: "butter_bridge",
-                body: "Well? Think about it.",
-                created_at: "1986-11-23T12:21:54.171Z",
-                votes: 0
-              },
-              {
-                article_id: 12,
-                title: "Moustache",
-                topic: "mitch",
-                author: "butter_bridge",
-                body: "Have you seen the size of that thing?",
-                created_at: "1974-11-26T12:21:54.171Z",
-                votes: 0
+            const articles = body.articles;
+            const constainAuthor = ({ articles }) => {
+              console.log(articles);
+              let count = 0;
+              for (let i = 0; i < articles.length; i++) {
+                count++;
               }
-            ]);
+              console.log(count);
+              return count;
+            };
+            expect(body.articles).to.be.an("array");
+            expect(constainAuthor({ articles })).to.equal(3);
+            //   expect(body.articles).to.be.eql([
+            //     {
+            //       article_id: 1,
+            //       title: "Living in the shadow of a great man",
+            //       topic: "mitch",
+            //       author: "butter_bridge",
+            //       body: "I find this existence challenging",
+            //       comment_count: "2",
+            //       created_at: "2018-11-15T12:21:54.171Z",
+            //       votes: 100
+            //     },
+            //     {
+            //       article_id: 9,
+            //       title: "They're not exactly dogs, are they?",
+            //       topic: "mitch",
+            //       author: "butter_bridge",
+            //       body: "Well? Think about it.",
+            //       comment_count: "0",
+            //       created_at: "1986-11-23T12:21:54.171Z",
+            //       votes: 0
+            //     },
+            //     {
+            //       article_id: 12,
+            //       title: "Moustache",
+            //       topic: "mitch",
+            //       author: "butter_bridge",
+            //       body: "Have you seen the size of that thing?",
+            //       comment_count: "0",
+            //       created_at: "1974-11-26T12:21:54.171Z",
+            //       votes: 0
+            //     }
+            //   ]);
           });
       });
       it("GET status:200, returns filtered articles by the topic value specified in the query", () => {
@@ -151,13 +184,14 @@ describe("/", () => {
                 topic: "cats",
                 author: "rogersop",
                 body: "Bastet walks amongst us, and the cats are taking arms!",
+                comment_count: "2",
                 created_at: "2002-11-19T12:21:54.171Z",
                 votes: 0
               }
             ]);
           });
       });
-      it("GET/:topic - status 404 - when topic not found", () => {
+      it("GET/:topic - status:404 - when topic not found", () => {
         return request(app)
           .get("/api/articles?topic=noExistingTopic")
           .expect(404)
@@ -165,7 +199,7 @@ describe("/", () => {
             expect(res.body.message).to.equal("not found");
           });
       });
-      it("GET/:authot - status 404 - when author not found", () => {
+      it.only("GET/:author - status:404 - when author not found", () => {
         return request(app)
           .get("/api/articles?author=noExistingAuthor")
           .expect(404)
@@ -229,7 +263,7 @@ describe("/", () => {
               });
             });
         });
-        it("PATCH/:article_id - status 400 - for an invalid article_id", () => {
+        it("PATCH/:article_id - status:400 - for an invalid article_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/articles/notAndId")
@@ -241,7 +275,7 @@ describe("/", () => {
               );
             });
         });
-        it("PATCH/:article_id - status 404 - for a non-existing article_id", () => {
+        it("PATCH/:article_id - status:404 - for a non-existing article_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/articles/1999999")
@@ -256,14 +290,14 @@ describe("/", () => {
             .patch("/api/articles")
             .expect(405);
         });
-        it("PUT/:article_id - status 405, for an invalid method", () => {
+        it("PUT/:article_id - status:405, for an invalid method", () => {
           return request(app)
             .put("/api/articles/1")
             .expect(405);
         });
       });
       describe("/:article_id/comments", () => {
-        it("POST/:article_id/comments  - status 201 - accepts an object with the username and body properties and responds with the posted comment", () => {
+        it("POST/:article_id/comments  - status:201 - accepts an object with the username and body properties and responds with the posted comment", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -278,7 +312,7 @@ describe("/", () => {
               );
             });
         });
-        it("POST/:article_id/comments  - status 400 - when passed a comment object with missing required keys", () => {
+        it("POST/:article_id/comments  - status:400 - when passed a comment object with missing required keys", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({
@@ -292,7 +326,7 @@ describe("/", () => {
               expect(res.body.message).to.equal(actual);
             });
         });
-        it("POST/:article_id/comments  - status 400 - when passed an empty comment object", () => {
+        it("POST/:article_id/comments  - status:400 - when passed an empty comment object", () => {
           return request(app)
             .post("/api/articles/1/comments")
             .send({})
@@ -303,7 +337,7 @@ describe("/", () => {
               );
             });
         });
-        it("POST/:article_id/comments - status 404 - valid article_id does not exist", () => {
+        it("POST/:article_id/comments - status:404 - valid article_id does not exist", () => {
           return request(app)
             .post("/api/articles/19999/comments")
             .send({
@@ -315,7 +349,7 @@ describe("/", () => {
               expect(res.body.message).to.equal("article not found");
             });
         });
-        it("GET/:article_id/comments - status 200 - an array of comments for the given article_id of which each comment should have the comment_id, votes, created_at, author and body properties", () => {
+        it("GET/:article_id/comments - status:200 - an array of comments for the given article_id of which each comment should have the comment_id, votes, created_at, author and body properties", () => {
           return request(app)
             .get("/api/articles/1/comments")
             .expect(200)
@@ -330,7 +364,7 @@ describe("/", () => {
               );
             });
         });
-        it("GET/:article_id/comments - status 200 - returns an array of comments for the given article_id sorted by article_id", () => {
+        it("GET/:article_id/comments - status:200 - returns an array of comments for the given article_id sorted by article_id", () => {
           return request(app)
             .get("/api/articles/1/comments?sort_by=votes")
             .expect(200)
@@ -341,7 +375,7 @@ describe("/", () => {
               });
             });
         });
-        it("GET/:article_id/comments - status 200 - returns an array of comments for the given article_id sorted by article_id in an ascending order", () => {
+        it("GET/:article_id/comments - status:200 - returns an array of comments for the given article_id sorted by article_id in an ascending order", () => {
           return request(app)
             .get("/api/articles/1/comments?order=asc")
             .expect(200)
@@ -352,7 +386,7 @@ describe("/", () => {
               });
             });
         });
-        it("GET/:article_id/comments - status 200 - returns an array of comments for the given article_id sorted by article_id in an descending order", () => {
+        it("GET/:article_id/comments - status:200 - returns an array of comments for the given article_id sorted by article_id in an descending order", () => {
           return request(app)
             .get("/api/articles/1/comments?order=asc")
             .expect(200)
@@ -381,7 +415,7 @@ describe("/", () => {
               expect(res.body.message).to.equal("article not found");
             });
         });
-        it("PUT/:article_id/comments - status 405 - for an invalid method", () => {
+        it("PUT/:article_id/comments - status:405 - for an invalid method", () => {
           return request(app)
             .put("/api/articles/3/comments")
             .expect(405);
@@ -406,7 +440,7 @@ describe("/", () => {
               });
             });
         });
-        it("PATCH/:comment_id - status 400 - for an invalid comment_id", () => {
+        it("PATCH/:comment_id - status:400 - for an invalid comment_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/comments/notAndId")
@@ -418,7 +452,7 @@ describe("/", () => {
               );
             });
         });
-        it("PATCH/:comment_id - status 404 - for a non-existing comment_id", () => {
+        it("PATCH/:comment_id - status:404 - for a non-existing comment_id", () => {
           const newVote = 10;
           return request(app)
             .patch("/api/comments/1999999")
@@ -428,7 +462,7 @@ describe("/", () => {
               expect(res.body.message).to.equal("comment not found");
             });
         });
-        it("PUT/:comments_id - status 405, for an invalid method", () => {
+        it("PUT/:comments_id - status:405, for an invalid method", () => {
           return request(app)
             .put("/api/comments/1")
             .expect(405);
@@ -438,7 +472,7 @@ describe("/", () => {
             .delete("/api/comments/3")
             .expect(204);
         });
-        it("DELETE/:comment_id - status 400 - for an invalid comment_id", () => {
+        it("DELETE/:comment_id - status:400 - for an invalid comment_id", () => {
           return request(app)
             .patch("/api/comments/notAndId")
             .expect(400)
@@ -448,7 +482,7 @@ describe("/", () => {
               );
             });
         });
-        it("DELETE/:comment_id - status 400 - for an non-existing comment_id", () => {
+        it("DELETE/:comment_id - status:400 - for an non-existing comment_id", () => {
           return request(app)
             .patch("/api/comments/199999")
             .expect(404)

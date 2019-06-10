@@ -35,13 +35,29 @@ exports.fetchAllArticles = ({
 }) => {
   return connection("articles")
     .select("articles.*")
+    .count("comment_id as comment_count")
     .from("articles")
+    .leftJoin("comments", "comments.article_id", "=", "articles.article_id")
+    .groupBy("articles.article_id")
     .orderBy(sort_by, order)
     .modify(query => {
-      if (author) query.where("author", author);
+      if (author) query.where("articles.author", author);
       else if (topic) query.where("topic", topic);
     })
     .then(articles => {
+      // console.log(articles);
       return articles;
     });
+
+  // return connection("articles")
+  //   .select("articles.*")
+  //   .from("articles")
+  //   .orderBy(sort_by, order)
+  //   .modify(query => {
+  //     if (author) query.where("author", author);
+  //     else if (topic) query.where("topic", topic);
+  //   })
+  //   .then(articles => {
+  //     return articles;
+  //   });
 };
