@@ -193,13 +193,13 @@ describe("/", () => {
               expect(body.article.comment_count).to.equal("13");
             });
         });
-        it("GET status:400, for an invalid article_id", () => {
+        it.only("GET status:400, for an invalid article_id", () => {
           return request(app)
             .get("/api/articles/notAndId")
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' invalid input syntax for integer: "notAndId"'
+                '400: invalid input syntax for integer: "notAndId"'
               );
             });
         });

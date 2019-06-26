@@ -9,10 +9,10 @@ exports.methodNotAllowed = (req, res) => {
 };
 
 exports.handlePsqlErrors = (err, req, res, next) => {
-  // console.log("inside 400", err);
+  console.log("inside 400", err);
   const psqlErrorCodes = ["23502", "23503", "42703", "22P02", "22003"];
   if (psqlErrorCodes.includes(err.code))
-    res.status(400).send({ message: err.message.split("-")[1] });
+    res.status(400).send({ message: `400:${err.message.split("-")[1]}` });
   else next(err);
 };
 
