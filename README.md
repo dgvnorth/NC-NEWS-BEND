@@ -36,6 +36,7 @@ sudo snap install insomnia
 
 ##### EndPoints
 
+```javascript
 GET /api
 Is the HomePage
 
@@ -66,6 +67,7 @@ Increment or decrements the votes of a comment by one. This route will require a
 
 DELETE /api/comments/:comment_id
 Deletes a comment by its comment_id
+```
 
 ### Built with
 
