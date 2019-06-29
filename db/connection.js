@@ -7,7 +7,3 @@ const dbConfig =
     : require("../knexfile");
 
 module.exports = knex(dbConfig);
-
-// const dbConfig = require('../knexfile');
-
-// module.exports = require('knex')(dbConfig);

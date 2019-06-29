@@ -4,7 +4,6 @@ exports.fetchArticleByArticleId = article_id => {
   return connection("articles")
     .where("articles.article_id", article_id)
     .select(
-      //'articles.*'
       "articles.article_id",
       "articles.author",
       "articles.body",
@@ -45,19 +44,6 @@ exports.fetchAllArticles = ({
       else if (topic) query.where("topic", topic);
     })
     .then(articles => {
-      // console.log(articles);
       return articles;
     });
-
-  // return connection("articles")
-  //   .select("articles.*")
-  //   .from("articles")
-  //   .orderBy(sort_by, order)
-  //   .modify(query => {
-  //     if (author) query.where("author", author);
-  //     else if (topic) query.where("topic", topic);
-  //   })
-  //   .then(articles => {
-  //     return articles;
-  //   });
 };

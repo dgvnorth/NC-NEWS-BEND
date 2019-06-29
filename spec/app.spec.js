@@ -193,7 +193,7 @@ describe("/", () => {
               expect(body.article.comment_count).to.equal("13");
             });
         });
-        it.only("GET status:400, for an invalid article_id", () => {
+        it("GET status:400, for an invalid article_id", () => {
           return request(app)
             .get("/api/articles/notAndId")
             .expect(400)
@@ -237,7 +237,7 @@ describe("/", () => {
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' invalid input syntax for integer: "notAndId"'
+                '400: invalid input syntax for integer: "notAndId"'
               );
             });
         });
@@ -288,7 +288,7 @@ describe("/", () => {
             .expect(400)
             .then(res => {
               const actual =
-                ' insert or update on table "comments" violates foreign key constraint "comments_author_foreign"';
+                '400: insert or update on table "comments" violates foreign key constraint "comments_author_foreign"';
               expect(res.body.message).to.equal(actual);
             });
         });
@@ -299,7 +299,7 @@ describe("/", () => {
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' null value in column "author" violates not'
+                '400: null value in column "author" violates not'
               );
             });
         });
@@ -369,7 +369,7 @@ describe("/", () => {
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' invalid input syntax for integer: "notAndId"'
+                '400: invalid input syntax for integer: "notAndId"'
               );
             });
         });
@@ -414,7 +414,7 @@ describe("/", () => {
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' invalid input syntax for integer: "notAndId"'
+                '400: invalid input syntax for integer: "notAndId"'
               );
             });
         });
@@ -440,17 +440,17 @@ describe("/", () => {
         });
         it("DELETE/:comment_id - status:400 - for an invalid comment_id", () => {
           return request(app)
-            .patch("/api/comments/notAndId")
+            .delete("/api/comments/notAndId")
             .expect(400)
             .then(res => {
               expect(res.body.message).to.equal(
-                ' invalid input syntax for integer: "notAndId"'
+                '400: invalid input syntax for integer: "notAndId"'
               );
             });
         });
         it("DELETE/:comment_id - status:400 - for an non-existing comment_id", () => {
           return request(app)
-            .patch("/api/comments/199999")
+            .delete("/api/comments/199999")
             .expect(404)
             .then(res => {
               expect(res.body.message).to.equal("comment not found");
