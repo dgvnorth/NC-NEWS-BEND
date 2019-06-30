@@ -38,39 +38,39 @@ sudo snap install insomnia
 
 ```javascript
 GET /api
-Is the HomePage
+/*Is the HomePage*/
 
 GET /api/topics
-Returns all topics
+/*Returns all topics*/
 
 GET /api/topics/:topic_id/articles
-Using a valid topic_id, it returns all articles for that topic
+/*Using a valid topic_id, it returns all articles for that topic*/
 
 GET /api/articles
-Returns all articles
+/*Returns all articles*/
 
 GET /api/articles/:articleId
-Returns an article by its ID
+/*Returns an article by its ID*/
 
 GET/api/articles/:aritcle_id/comments
-Using a valid article_id, it returns all comments for that article
+/*Using a valid article_id, it returns all comments for that article*/
 
 POST /api/articles/:article_id/comments
-Adds a new comment to an article. This route requires a JSON body in the following format with the exact keys i.e: {"username": "jessjelly",
-"body": "Your comment here"}
+/*Adds a new comment to an article. This route requires a JSON body in the following format with the exact keys i.e: {"username": "jessjelly",
+"body": "Your comment here"}*/
 
 PATCH /api/articles/:article_id
-Increment or decrements the votes of an article by one. This route will require a JSON body in the following format with the exact key i.e: {"inc_votes": 1 }
+/*Increments or decrements the votes of an article by one. This route will require a JSON body in the following format with the exact key i.e: {"inc_votes": 1 }*/
 
 PATCH /api/comments/:comment_id
-Increment or decrements the votes of a comment by one. This route will require a JSON body in the following format with the exact key i.e: {"inc_votes": 1 }
+/*Increments or decrements the votes of a comment by one. This route will require a JSON body in the following format with the exact key i.e: {"inc_votes": 1 }*/
 
 DELETE /api/comments/:comment_id
-Deletes a comment by its comment_id
+/*Deletes a comment by its comment_id*/
 ```
 
 ### Built with
 
-- [NPM](https://www.npmjs.com/) - JavaScript package manager
+- [npm](https://www.npmjs.com/) - JavaScript package manager
 - [ExpressJS](https://expressjs.com/) - Web framework for Node.js
 - [KnexJS](https://knexjs.org/) - SQL Query builder
