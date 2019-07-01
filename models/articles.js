@@ -48,12 +48,8 @@ exports.fetchAllArticles = ({
           .where("title", "like", `%${search}%`)
           .orWhere("articles.body", "like", `%${search}%`)
           .orWhere("articles.author", "like", `%${search}%`);
-      // .orWhere("articles.created_at", "like", `%${search}%`);
-      console.log(search);
     })
     .then(articles => {
-      console.log(articles);
-
       return articles;
     });
 };

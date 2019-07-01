@@ -54,8 +54,9 @@ exports.deleteCommentById = (req, res, next) => {
   removeComment(comment_id)
     .then(delCount => {
       if (delCount) res.sendStatus(204);
-      else if (!delCount)
+      else if (!delCount) {
         return Promise.reject({ status: 404, msg: "comment not found" });
+      }
     })
     .catch(next);
 };

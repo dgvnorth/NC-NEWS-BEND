@@ -96,12 +96,11 @@ describe("/", () => {
             expect(body.articles[0].comment_count).to.equal("13");
           });
       });
-      it.only("GET status:200, returns all article objects matching the search requirements", () => {
+      it("GET status:200, returns all article objects matching the search requirements", () => {
         return request(app)
           .get("/api/articles?search=pug")
           .expect(200)
           .then(({ body }) => {
-            console.log(body.articles);
             expect(body.articles.length).to.equal(1);
           });
       });
@@ -462,7 +461,7 @@ describe("/", () => {
             .delete("/api/comments/199999")
             .expect(404)
             .then(res => {
-              expect(res.body.message).to.equal("comment not found");
+              expect(res.body.msg).to.equal("comment not found");
             });
         });
       });
