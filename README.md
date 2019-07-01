@@ -1,6 +1,6 @@
 ## NC News API
 
-NC News API is the RESTful API for my [NC News](https://dgv-nc-news.netlify.com/), a Reddit-style website to enjoy northcoders news.
+NC News API is the RESTful API for [NC News](https://dgv-nc-news.netlify.com/), a Reddit-style website to enjoy northcoders news.
 
 The [API](https://dgv-nc-news.herokuapp.com/api/articles) for [NC News](https://dgv-nc-news.netlify.com/) has been hosted on [Heroku](https://www.heroku.com/) and can be accessed on https://dgv-nc-news.herokuapp.com/api/articles.
 
