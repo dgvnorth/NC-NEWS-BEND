@@ -96,6 +96,15 @@ describe("/", () => {
             expect(body.articles[0].comment_count).to.equal("13");
           });
       });
+      it.only("GET status:200, returns all article objects matching the search requirements", () => {
+        return request(app)
+          .get("/api/articles?search=pug")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body.articles);
+            expect(body.articles.length).to.equal(1);
+          });
+      });
       it("GET status:200, returns an article object sorted_by any valid column containing the author, article_id, body, topic, created_at, votes and comment_count properties", () => {
         return request(app)
           .get("/api/articles?sort_by=author")

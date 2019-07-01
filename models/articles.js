@@ -30,7 +30,8 @@ exports.fetchAllArticles = ({
   author,
   topic,
   sort_by = "created_at",
-  order = "desc"
+  order = "desc",
+  search = ""
 }) => {
   return connection("articles")
     .select("articles.*")
@@ -42,8 +43,17 @@ exports.fetchAllArticles = ({
     .modify(query => {
       if (author) query.where("articles.author", author);
       else if (topic) query.where("topic", topic);
+      else if (search)
+        query
+          .where("title", "like", `%${search}%`)
+          .orWhere("articles.body", "like", `%${search}%`)
+          .orWhere("articles.author", "like", `%${search}%`);
+      // .orWhere("articles.created_at", "like", `%${search}%`);
+      console.log(search);
     })
     .then(articles => {
+      console.log(articles);
+
       return articles;
     });
 };

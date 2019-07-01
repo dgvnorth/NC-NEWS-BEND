@@ -14,25 +14,35 @@ Ensure that you have [NodeJS](https://nodejs.org/en/) and [PostgreSQL](https://w
 
 Clone this repository:
 
+```javascript
 git clone https://github.com/dgvnorth/NC-NEWS-BEND
+```
 
 Install npm packages
 
+```javascript
 npm install
+```
 
 #### Testing
 
+```javascript
 npm test
+```
 
 #### Running development server
 
+```javascript
 npm run dev
+```
 
 #### Using the API
 
 The below are all available endpoints. GET requests can be easily access on a browser, preferably google chrome, by connecting to localhost:9090/api. [Insomnia](https://insomnia.rest/) is recommended for POST, PUT or DELETE requests. Link: https://insomnia.rest/
 
+```javascript
 sudo snap install insomnia
+```
 
 ##### EndPoints
 
